@@ -1,5 +1,51 @@
 import React, { useMemo, useState } from "react";
 
+function Field({ label, children }) {
+  return (
+    <label className="flex flex-col gap-1">
+      <span className="text-sm font-medium text-slate-700">{label}</span>
+      {children}
+    </label>
+  );
+}
+
+function InputNumber({ value, onChange, step = 1, placeholder = "" }) {
+  return (
+    <input
+      type="text"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      step={step}
+      value={value === 0 ? "" : String(value)}
+      placeholder={placeholder}
+      onChange={(e) => {
+        const digits = e.target.value.replace(/[^0-9.]/g, "");
+        if (digits === "") {
+          onChange(0);
+          return;
+        }
+        onChange(Number(digits));
+      }}
+      className="rounded-xl border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-400"
+    />
+  );
+}
+
+function Select({ value, onChange, options }) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="rounded-xl border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-400"
+    >
+      {options.map((o) => {
+        const option = typeof o === "object" ? o : { value: o, label: o };
+        return <option key={String(option.value)} value={option.value}>{option.label}</option>;
+      })}
+    </select>
+  );
+}
+
 export default function ExitPlanningAppPrototype() {
 
   const currency = (n) =>
@@ -239,75 +285,6 @@ export default function ExitPlanningAppPrototype() {
       alloc: { core: coreAlloc, coreOptional: winningScenario.alloc },
     };
   }, [input]);
-
-  const Field = ({ label, children }) => (
-    <label className="flex flex-col gap-1">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
-      {children}
-    </label>
-  );
-
-  const InputNumber = ({ value, onChange, step = 1, placeholder = "" }) => {
-  const [text, setText] = useState(value === 0 ? "" : String(value));
-
-  React.useEffect(() => {
-    const normalized = value === 0 ? "" : String(value);
-    if (normalized !== text) setText(normalized);
-  }, [value]);
-
-  return (
-    <input
-      type="text"
-      inputMode="decimal"
-      enterKeyHint="done"
-      autoComplete="off"
-      autoCorrect="off"
-      spellCheck={false}
-      value={text}
-      placeholder={placeholder}
-      onChange={(e) => {
-        const next = e.target.value.replace(/[^0-9.]/g, "");
-        setText(next);
-
-        if (next === "" || next === ".") {
-          onChange(0);
-          return;
-        }
-
-        const parsed = Number(next);
-        if (!Number.isNaN(parsed)) onChange(parsed);
-      }}
-      onBlur={() => {
-        if (text === "" || text === ".") {
-          setText("");
-          onChange(0);
-          return;
-        }
-
-        const parsed = Number(text);
-        if (!Number.isNaN(parsed)) {
-          const normalized = String(parsed);
-          setText(normalized);
-          onChange(parsed);
-        }
-      }}
-      className="rounded-xl border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-400"
-    />
-  );
-};
-
-  const Select = ({ value, onChange, options }) => (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="rounded-xl border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-400"
-    >
-      {options.map((o) => {
-        const option = typeof o === "object" ? o : { value: o, label: o };
-        return <option key={String(option.value)} value={option.value}>{option.label}</option>;
-      })}
-    </select>
-  );
 
   const scenarioRows = [
     {
