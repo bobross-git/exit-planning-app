@@ -247,25 +247,54 @@ export default function ExitPlanningAppPrototype() {
     </label>
   );
 
-  const InputNumber = ({ value, onChange, step = 1, placeholder = "" }) => (
+  const InputNumber = ({ value, onChange, step = 1, placeholder = "" }) => {
+  const [text, setText] = useState(value === 0 ? "" : String(value));
+
+  React.useEffect(() => {
+    const normalized = value === 0 ? "" : String(value);
+    if (normalized !== text) setText(normalized);
+  }, [value]);
+
+  return (
     <input
       type="text"
-      inputMode="numeric"
-      pattern="[0-9]*"
-      step={step}
-      value={value === 0 ? "" : String(value)}
+      inputMode="decimal"
+      enterKeyHint="done"
+      autoComplete="off"
+      autoCorrect="off"
+      spellCheck={false}
+      value={text}
       placeholder={placeholder}
       onChange={(e) => {
-        const digits = e.target.value.replace(/[^0-9.]/g, "");
-        if (digits === "") {
+        const next = e.target.value.replace(/[^0-9.]/g, "");
+        setText(next);
+
+        if (next === "" || next === ".") {
           onChange(0);
           return;
         }
-        onChange(Number(digits));
+
+        const parsed = Number(next);
+        if (!Number.isNaN(parsed)) onChange(parsed);
+      }}
+      onBlur={() => {
+        if (text === "" || text === ".") {
+          setText("");
+          onChange(0);
+          return;
+        }
+
+        const parsed = Number(text);
+        if (!Number.isNaN(parsed)) {
+          const normalized = String(parsed);
+          setText(normalized);
+          onChange(parsed);
+        }
       }}
       className="rounded-xl border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-400"
     />
   );
+};
 
   const Select = ({ value, onChange, options }) => (
     <select
