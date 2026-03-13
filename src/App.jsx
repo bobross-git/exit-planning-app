@@ -247,12 +247,22 @@ export default function ExitPlanningAppPrototype() {
     </label>
   );
 
-  const InputNumber = ({ value, onChange, step = 1 }) => (
+  const InputNumber = ({ value, onChange, step = 1, placeholder = "" }) => (
     <input
-      type="number"
+      type="text"
+      inputMode="numeric"
+      pattern="[0-9]*"
       step={step}
-      value={value}
-      onChange={(e) => onChange(Number(e.target.value || 0))}
+      value={value === 0 ? "" : String(value)}
+      placeholder={placeholder}
+      onChange={(e) => {
+        const digits = e.target.value.replace(/[^0-9.]/g, "");
+        if (digits === "") {
+          onChange(0);
+          return;
+        }
+        onChange(Number(digits));
+      }}
       className="rounded-xl border border-slate-300 px-3 py-2 outline-none focus:ring-2 focus:ring-slate-400"
     />
   );
@@ -355,20 +365,20 @@ export default function ExitPlanningAppPrototype() {
           <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
             <h2 className="text-xl font-semibold text-slate-900">Inputs</h2>
             <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              <Field label="Age"><InputNumber value={input.age} onChange={(v) => set("age", v)} /></Field>
-              <Field label="Net Liquidity After Tax"><InputNumber value={input.netLiquidityAfterTax} onChange={(v) => set("netLiquidityAfterTax", v)} /></Field>
+              <Field label="Age"><Select value={input.age} onChange={(v) => set("age", Number(v))} options={Array.from({ length: 53 }, (_, i) => 28 + i)} /></Field>
+              <Field label="Net Liquidity After Tax"><InputNumber value={input.netLiquidityAfterTax} onChange={(v) => set("netLiquidityAfterTax", v)} placeholder="Enter amount" /></Field>
               <Field label="Estate Exposure"><Select value={input.estateExposure} onChange={(v) => set("estateExposure", v)} options={["Yes", "No"]} /></Field>
               <Field label="Health Rating"><Select value={input.healthRating} onChange={(v) => set("healthRating", v)} options={["Ultra", "Select NT", "NT", "Select T", "Tobacco"]} /></Field>
               <Field label="Married"><Select value={input.married} onChange={(v) => set("married", v)} options={["Yes", "No"]} /></Field>
-              <Field label="Charitable Intent (1-5)"><InputNumber value={input.charitableIntent} onChange={(v) => set("charitableIntent", v)} /></Field>
-              <Field label="Desire for Leverage (1-5)"><InputNumber value={input.desireForLeverage} onChange={(v) => set("desireForLeverage", v)} /></Field>
+              <Field label="Charitable Intent (1-5)"><Select value={input.charitableIntent} onChange={(v) => set("charitableIntent", Number(v))} options={[1, 2, 3, 4, 5]} /></Field>
+              <Field label="Desire for Leverage (1-5)"><Select value={input.desireForLeverage} onChange={(v) => set("desireForLeverage", Number(v))} options={[1, 2, 3, 4, 5]} /></Field>
               <Field label="Max QOZ Exposure"><Select value={input.maxQozExposure} onChange={(v) => set("maxQozExposure", Number(v))} options={qozExposureOptions} /></Field>
               <Field label="Minimum Liquidity Floor"><Select value={input.minLiquidityFloor} onChange={(v) => set("minLiquidityFloor", Number(v))} options={liquidityFloorOptions} /></Field>
               <Field label="Sale of Highly Appreciated Asset?"><Select value={input.appreciatedSale} onChange={(v) => set("appreciatedSale", v)} options={["Yes", "No"]} /></Field>
               <Field label="Long-Term Capital Gain?"><Select value={input.ltcgExists} onChange={(v) => set("ltcgExists", v)} options={["Yes", "No"]} /></Field>
               <Field label="Primary Objective"><Select value={input.primaryObjective} onChange={(v) => set("primaryObjective", v)} options={["Tax Deferral", "Income Creation", "Estate Planning"]} /></Field>
-              <Field label="Gross Exit Value"><InputNumber value={input.grossExitValue} onChange={(v) => set("grossExitValue", v)} /></Field>
-              <Field label="Cost Basis"><InputNumber value={input.costBasis} onChange={(v) => set("costBasis", v)} /></Field>
+              <Field label="Gross Exit Value"><InputNumber value={input.grossExitValue} onChange={(v) => set("grossExitValue", v)} placeholder="Enter amount" /></Field>
+              <Field label="Cost Basis"><InputNumber value={input.costBasis} onChange={(v) => set("costBasis", v)} placeholder="Enter amount" /></Field>
             </div>
           </div>
 
